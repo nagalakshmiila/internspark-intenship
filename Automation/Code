@@ -1,1 +1,62 @@
+import os
+import shutil
+import logging
 
+# Create log file
+logging.basicConfig(
+    filename='file_automation.log',
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s'
+)
+
+print("===== FILE AUTOMATION SCRIPT =====")
+
+# Get folder path from user
+folder_path = input("Enter folder path: ")
+
+try:
+    # Check if folder exists
+    if not os.path.exists(folder_path):
+        raise FileNotFoundError("Folder does not exist!")
+
+    # Create folders
+    image_folder = os.path.join(folder_path, "Images")
+    text_folder = os.path.join(folder_path, "TextFiles")
+    other_folder = os.path.join(folder_path, "Others")
+
+    os.makedirs(image_folder, exist_ok=True)
+    os.makedirs(text_folder, exist_ok=True)
+    os.makedirs(other_folder, exist_ok=True)
+
+    # Read all files
+    files = os.listdir(folder_path)
+
+    for file in files:
+        file_path = os.path.join(folder_path, file)
+
+        # Skip folders
+        if os.path.isdir(file_path):
+            continue
+
+        # Get file extension
+        extension = os.path.splitext(file)[1].lower()
+
+        # Move files
+        if extension in ['.jpg', '.png', '.jpeg']:
+            shutil.move(file_path, image_folder)
+            logging.info(f"Moved image file: {file}")
+
+        elif extension in ['.txt', '.pdf', '.docx']:
+            shutil.move(file_path, text_folder)
+            logging.info(f"Moved text/document file: {file}")
+
+        else:
+            shutil.move(file_path, other_folder)
+            logging.info(f"Moved other file: {file}")
+
+    print("Files organized successfully!")
+    logging.info("Automation completed successfully.")
+
+except Exception as e:
+    print("Error:", e)
+    logging.error(f"Error occurred: {e}")
